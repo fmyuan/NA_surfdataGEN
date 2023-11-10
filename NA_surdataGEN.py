@@ -104,13 +104,9 @@ dst.createDimension('y_dim', y_dim.size)
 for name, variable in src.variables.items():
     start = process_time()
     print("Working on varibale: "+ name + " dimensions: " + str(variable.dimensions))
-    # need to move inside the if statement
-    #x = dst.createVariable(name, variable.datatype, variable.dimensions)    
-    # Copy variable attributes
-    #dst[name].setncatts(src[name].__dict__)
     
     # Check if the last two dimensions are lsmlat and lsmlon
-    if variable.dimensions[-2:] == ('lsmlat', 'lsmlon'):
+    if (variable.dimensions[-2:] == ('lsmlat', 'lsmlon')):
         # Determine the interpolation method
         if name in Variable_nearest:
             iMethod = 'nearest'
@@ -122,24 +118,29 @@ for name, variable in src.variables.items():
         x = dst.createVariable(name, variable.datatype, variable.dimensions[:-2]+ ('y_dim', 'x_dim'))
         # Copy variable attributes
         dst[name].setncatts(src[name].__dict__)
-
+        
         # prepare the array for the interpolated result
-        data = np.zeros((len(y_dim),len(x_dim)), dtype=variable.datatype)
-        f_data = np.ma.array(data, mask=bool_mask)
-        f_data1 = data[bool_mask]
+        f_data = np.ma.array(np.zeros((len(y_dim),len(x_dim)), dtype=variable.datatype), mask=bool_mask)
+        #data = np.zeros((len(y_dim),len(x_dim)), dtype=variable.datatype)
+        #f_data = np.ma.array(data, mask=bool_mask)
+        f_data1 = f_data[bool_mask]
+        print(name, f_data1.shape, f_data.shape, f_data.mask.shape, bool_mask.shape)  
+
         # Interpolate the variable
         o_data=np.zeros(land_points, dtype=variable.datatype)
-
+         
         # Handle variables with two dimensions
         if (len(variable.dimensions) == 2):
             source = src[name][:]
             for i in range(land_points):
                 # source is in [lat, lon] format
                 o_data[i] = source[int(points_in_daymet_land[i][4]),int(points_in_daymet_land[i][5])]
+              
             f_data1 = griddata(points, o_data, (grid_y1, grid_x1), method=iMethod)
-
+            print(name, o_data[0:5], f_data1[0:5], f_data1.shape, f_data.shape)    
             # put the masked data back to the data (with the daymet land mask)
-            f_data[bool_mask]=f_data1      
+            f_data[bool_mask]=f_data1   
+
             # Assign the interpolated data
             dst[name][:] = f_data
 
@@ -156,6 +157,7 @@ for name, variable in src.variables.items():
                 # put the masked data back to the data (with the daymet land mask)
                 f_data[bool_mask]=f_data1
                 dst[name][index, :, :] = f_data
+                print(name, index, o_data[0:5], f_data1[0:5], f_data1.shape, f_data.shape)  
 
         # Handle variables with four dimensions
         if (len(variable.dimensions) == 4):
@@ -172,12 +174,14 @@ for name, variable in src.variables.items():
                     # put the masked data back to the data (with the daymet land mask)
                     f_data[bool_mask]=f_data1
 
-                    dst[name][index1,index2,:,:] = f_data            
+                    dst[name][index1,index2,:,:] = f_data
+                    print(name, index1, index2, o_data[0:5], f_data1[0:5], f_data1.shape, f_data.shape)         
 
         end = process_time()
-        print("Generating variable: " +name+ "takes  {}".format(end-start))
+        print("Generating variable: " +name+ " takes  {}".format(end-start))
 
     else:
+
         # keep variables with the same dimension
         x = dst.createVariable(name, variable.datatype, variable.dimensions)
         # Copy variable attributes
@@ -186,8 +190,8 @@ for name, variable in src.variables.items():
         dst[name][:] = src[name][:]
 
         end = process_time()
-        print("Coping variable: " +name+ "takes  {}".format(end-start))
-
+        print("Coping variable: " +name+ " takes  {}".format(end-start))
+        
 
 # Close the files
 src.close()
