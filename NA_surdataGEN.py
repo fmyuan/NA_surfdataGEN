@@ -7,12 +7,18 @@ from time import process_time
 
 Points_in_land = "DataConversion_info/original_points_index.csv"
 
+# Only wariables listed will be processed
+
 # nearest neighbor:"double" variables
 Variable_nearest = ['SLOPE', 'TOPO', 'PCT_GLACIER', 'PCT_LAKE', 'STD_ELEV']
 # nearest neighbor:"int" variables
 Variable_nearest += ['PFTDATA_MASK','SOIL_COLOR', 'SOIL_ORDER', 'abm']
 # nearest neighbor:"double" variables (added 11/07/22023)
 Variable_nearest += ['EF1_BTR', 'EF1_CRP', 'EF1_FDT', 'EF1_FET', 'EF1_GRS', 'EF1_SHR']
+
+# nearest neighbor: "double" variables (added 11/10/2023)
+Variable_nearest += ['PCT_SAND', 'PCT_CLAY','ORGANIC' ,'PCT_NAT_PFT', 
+        'MONTHLY_LAI', 'MONTHLY_SAI' ,'MONTHLY_HEIGHT_TOP', 'MONTHLY_HEIGHT_BOT']
 
 # nearest neighbor:"int" variables (gridcell)
 Variable_urban_nearest = ['URBAN_REGION_ID']
@@ -113,7 +119,8 @@ for name, variable in src.variables.items():
         elif name in Variable_linear:
             iMethod = 'linear'
         else:
-            continue
+            continue    # Skip all variables that are included in the variable lists
+
         # create variables with the new dimensions
         x = dst.createVariable(name, variable.datatype, variable.dimensions[:-2]+ ('y_dim', 'x_dim'))
         # Copy variable attributes
@@ -190,7 +197,7 @@ for name, variable in src.variables.items():
         dst[name][:] = src[name][:]
 
         end = process_time()
-        print("Coping variable: " +name+ " takes  {}".format(end-start))
+        print("Copying variable: " +name+ " takes  {}".format(end-start))
         
 
 # Close the files
