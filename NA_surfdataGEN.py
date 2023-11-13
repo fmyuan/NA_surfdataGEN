@@ -8,7 +8,7 @@ from time import process_time
 Points_in_land = "DataConversion_info/original_points_index.csv"
 
 # Only wariables listed will be processed
-
+'''
 # nearest neighbor:"double" variables
 Variable_nearest = ['SLOPE', 'TOPO', 'PCT_GLACIER', 'PCT_LAKE', 'STD_ELEV']
 # nearest neighbor:"int" variables
@@ -51,17 +51,27 @@ Variable_linear = ['FMAX', 'Ws', 'ZWT0', 'binfl', 'gdp',
 
 # linear:"double" variables (added 11/07/22023)
 Variable_linear += ['APATITE_P', 'PCT_CROP']
-
+'''
 #Variable_nearest = ['SLOPE', 'TOPO', 'PCT_GLACIER', 'PCT_LAKE', 'STD_ELEV']
 
 #Variable_linear = ['FMAX', 'Ws', 'ZWT0', 'binfl', 'gdp']
+
+# nearest neighbor: "double" variables (added 11/10/2023)
+Variable_nearest = ['PCT_SAND', 'PCT_CLAY','ORGANIC' ,'PCT_NAT_PFT', 
+        'MONTHLY_LAI', 'MONTHLY_SAI' ,'MONTHLY_HEIGHT_TOP', 'MONTHLY_HEIGHT_BOT']
+Variable_linear = []
 
 # Open the source file
 src = nc.Dataset('surfdata.nc', 'r')
 
 # Create a new file
+
 output_file = "hr_surfdata_v1_part1.nc"
 dst = nc.Dataset(output_file, 'w')
+
+# Create new dimensions
+#dst.createDimension('x_dim', 7814)
+#dst.createDimension('y_dim', 8075)
 
 # Copy dimensions
 for name, dimension in src.dimensions.items():
@@ -189,7 +199,7 @@ for name, variable in src.variables.items():
             print(np.nanmin(o_data), np.nanmin(f_data1),np.nanmin(f_data[f_data != -9999]),np.nanmin(dst[name]))   
             print(np.nansum(o_data), np.nansum(f_data1),np.nansum(f_data[f_data != -9999]),np.nansum(dst[name]))  
 
-            count = count+1
+            count = count + 1
 
         # Handle variables with three dimensions
         if (len(variable.dimensions) == 3):
@@ -262,7 +272,9 @@ for name, variable in src.variables.items():
         
     if count > 50:
         dst.close()   # output the variable into file to save memory
+
         dst = nc.Dataset(output_file, 'a')
+
         count = 0
 
 # Close the files
