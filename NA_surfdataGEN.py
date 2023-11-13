@@ -114,6 +114,8 @@ for i in range(land_points):
 dst.createDimension('x_dim', x_dim.size)
 dst.createDimension('y_dim', y_dim.size)
 
+count = 0 # record how may 2D layers have been processed 
+
 # Copy variables
 for name, variable in src.variables.items():
     start = process_time()
@@ -182,6 +184,8 @@ for name, variable in src.variables.items():
             print(np.nanmin(o_data), np.nanmin(f_data1),np.nanmin(f_data[f_data != -9999]),np.nanmin(dst[name]))   
             print(np.nansum(o_data), np.nansum(f_data1),np.nansum(f_data[f_data != -9999]),np.nansum(dst[name]))  
 
+            count = count+1
+
         # Handle variables with three dimensions
         if (len(variable.dimensions) == 3):
             for index in range(variable.shape[0]):
@@ -206,6 +210,7 @@ for name, variable in src.variables.items():
                 print(np.nanmin(o_data), np.nanmin(f_data1),np.nanmin(f_data[f_data != -9999]),np.nanmin(dst[name][index,:,:]))   
                 print(np.nansum(o_data), np.nansum(f_data1),np.nansum(f_data[f_data != -9999]),np.nansum(dst[name][index,:,:]))  
 
+            count = count + variable.shape[0]
 
         # Handle variables with four dimensions
         if (len(variable.dimensions) == 4):
@@ -227,11 +232,13 @@ for name, variable in src.variables.items():
 
                     # Assign the interpolated data to dst.variable
                     dst[name][index1,index2,:,:] = np.copy(f_data)
-                print(name, index1, index2, o_data[0:5], f_data1[0:5], f_data[0,5254:5261], f_data1.shape, f_data.shape)
-                print("o_data, f_data1, f_data, dst: max/min/sum")  
-                print(np.nanmax(o_data), np.nanmax(f_data1),np.nanmax(f_data[f_data != -9999]),np.nanmax(dst[name][index1,index2,:,:]))
-                print(np.nanmin(o_data), np.nanmin(f_data1),np.nanmin(f_data[f_data != -9999]),np.nanmin(dst[name][index1,index2,:,:]))   
-                print(np.nansum(o_data), np.nansum(f_data1),np.nansum(f_data[f_data != -9999]),np.nansum(dst[name][index1,index2,:,:]))  
+                    print(name, index1, index2, o_data[0:5], f_data1[0:5], f_data[0,5254:5261], f_data1.shape, f_data.shape)
+                    print("o_data, f_data1, f_data, dst: max/min/sum")  
+                    print(np.nanmax(o_data), np.nanmax(f_data1),np.nanmax(f_data[f_data != -9999]),np.nanmax(dst[name][index1,index2,:,:]))
+                    print(np.nanmin(o_data), np.nanmin(f_data1),np.nanmin(f_data[f_data != -9999]),np.nanmin(dst[name][index1,index2,:,:]))   
+                    print(np.nansum(o_data), np.nansum(f_data1),np.nansum(f_data[f_data != -9999]),np.nansum(dst[name][index1,index2,:,:]))  
+
+                count = count + variable.shape[1]
 
         end = process_time()
         print("Generating variable: " +name+ " takes  {}".format(end-start))
@@ -248,6 +255,10 @@ for name, variable in src.variables.items():
         end = process_time()
         print("Copying variable: " +name+ " takes  {}".format(end-start))
         
+    if count > 50:
+        dst.close()   # output the variable into file to save memory
+        dst = nc.Dataset('hr_surfdata_test1.nc', 'a')
+        count = 0
 
 # Close the files
 src.close()
