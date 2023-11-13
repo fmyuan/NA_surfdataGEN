@@ -262,7 +262,7 @@ for name, variable in src.variables.items():
         
     if count > 50:
         dst.close()   # output the variable into file to save memory
-        dst = nc.Dataset('hr_surfdata_test2_v8.nc', 'a')
+        dst = nc.Dataset('hr_surfdata_test2_8v.nc', 'a')
         count = 0
 
 # Close the files
