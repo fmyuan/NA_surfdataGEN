@@ -60,11 +60,8 @@ Variable_linear += ['APATITE_P', 'PCT_CROP']
 src = nc.Dataset('surfdata.nc', 'r')
 
 # Create a new file
-dst = nc.Dataset('hr_surfdata_test1.nc', 'w')
-
-# Create new dimensions
-#dst.createDimension('x_dim', 7814)
-#dst.createDimension('y_dim', 8075)
+output_file = "hr_surfdata_v1_part1.nc"
+dst = nc.Dataset(output_file, 'w')
 
 # Copy dimensions
 for name, dimension in src.dimensions.items():
@@ -85,6 +82,8 @@ bool_mask = ~np.isnan(TBOT)
 grid_x, grid_y = np.meshgrid(x_dim,y_dim)
 grid_y1 = np.copy(grid_y[bool_mask])
 grid_x1 = np.copy(grid_x[bool_mask])
+
+del grid_x, grid_y
 
 gridcells= len(grid_x1)
 #grid_y1=grid_y1.compressed()
@@ -132,7 +131,13 @@ for name, variable in src.variables.items():
             continue    # Skip all variables that are included in the variable lists
 
         # create variables with the new dimensions
-        x = dst.createVariable(name, variable.datatype, variable.dimensions[:-2]+ ('y_dim', 'x_dim'), fill_value = -9999)
+
+        if variable.datatype == np.int32:
+            fill_value = -9999  # or any other value that you want to use to represent missing data
+        else:
+            fill_value = np.nan
+
+        x = dst.createVariable(name, variable.datatype, variable.dimensions[:-2]+ ('y_dim', 'x_dim'), fill_value = fill_value)
         # Copy variable attributes
         dst[name].setncatts(src[name].__dict__)
         """
@@ -172,8 +177,8 @@ for name, variable in src.variables.items():
             f_data = np.ma.filled(f_data, -9999)
             '''
             bool_mask = ~np.isnan(TBOT)
-            f_data = np.ma.array(np.empty((len(y_dim),len(x_dim)), dtype=variable.datatype), mask=bool_mask, fill_value=-9999)
-            f_data =  np.where(f_data.mask, f_data, np.nan)
+            f_data = np.ma.array(np.empty((len(y_dim),len(x_dim)), dtype=variable.datatype), mask=bool_mask, fill_value=fill_value)
+            f_data =  np.where(f_data.mask, f_data, fill_value)
             f_data[bool_mask]=f_data1 
 
             # Assign the interpolated data
@@ -198,8 +203,8 @@ for name, variable in src.variables.items():
 
                 # create a mask array to hold the interpolated data
                 bool_mask = ~np.isnan(TBOT)
-                f_data = np.ma.array(np.empty((len(y_dim),len(x_dim)), dtype=variable.datatype), mask=bool_mask, fill_value=-9999)
-                f_data =  np.where(f_data.mask, f_data, np.nan)
+                f_data = np.ma.array(np.empty((len(y_dim),len(x_dim)), dtype=variable.datatype), mask=bool_mask, fill_value=fill_value)
+                f_data =  np.where(f_data.mask, f_data, fill_value)
                 f_data[bool_mask]=f_data1 
 
                 # Assign the interpolated data to dst.variable
@@ -226,8 +231,8 @@ for name, variable in src.variables.items():
 
                     # create a mask array to hold the interpolated data
                     bool_mask = ~np.isnan(TBOT)
-                    f_data = np.ma.array(np.empty((len(y_dim),len(x_dim)), dtype=variable.datatype), mask=bool_mask, fill_value=-9999)
-                    f_data =  np.where(f_data.mask, f_data, np.nan)
+                    f_data = np.ma.array(np.empty((len(y_dim),len(x_dim)), dtype=variable.datatype), mask=bool_mask, fill_value=fill_value)
+                    f_data =  np.where(f_data.mask, f_data, fill_value)
                     f_data[bool_mask]=f_data1 
 
                     # Assign the interpolated data to dst.variable
@@ -257,7 +262,7 @@ for name, variable in src.variables.items():
         
     if count > 50:
         dst.close()   # output the variable into file to save memory
-        dst = nc.Dataset('hr_surfdata_test1.nc', 'a')
+        dst = nc.Dataset(output_file, 'a')
         count = 0
 
 # Close the files
