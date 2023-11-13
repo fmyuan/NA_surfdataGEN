@@ -10,6 +10,6 @@ for i in range(len(lines)):
     elif lines[i].startswith("o_data, f_data1, f_data, dst: max/min/sum"):
         for j in range(i+1, i+4):
             val1, val2, val3, val4 = map(float, lines[j].split())
-            if (val2 != val3) or (val3 != val4):
-                print(val2, val3, val4)
-                print("Wrong calculation of variable " + Var_name + "(at line) "+ str(j))
+            if val2 != val3 or val3 != val4:
+                print(val2, val3, val4) 
+                print("Differences found with variable " + Var_name + "(at line) "+ str(j))

@@ -119,7 +119,8 @@ for i in range(land_points):
 dst.createDimension('x_dim', x_dim.size)
 dst.createDimension('y_dim', y_dim.size)
 
-count =0
+count = 0 # record how may 2D layers have been processed 
+
 # Copy variables
 for name, variable in src.variables.items():
     start = process_time()
@@ -213,7 +214,7 @@ for name, variable in src.variables.items():
                 print(np.nanmax(o_data), np.nanmax(f_data1),np.nanmax(f_data[f_data != -9999]),np.nanmax(dst[name][index,:,:]))
                 print(np.nanmin(o_data), np.nanmin(f_data1),np.nanmin(f_data[f_data != -9999]),np.nanmin(dst[name][index,:,:]))   
                 print(np.nansum(o_data), np.nansum(f_data1),np.nansum(f_data[f_data != -9999]),np.nansum(dst[name][index,:,:]))  
-            
+
             count = count + variable.shape[0]
 
         # Handle variables with four dimensions
@@ -243,7 +244,7 @@ for name, variable in src.variables.items():
                     print(np.nansum(o_data), np.nansum(f_data1),np.nansum(f_data[f_data != -9999]),np.nansum(dst[name][index1,index2,:,:]))  
 
                 count = count + variable.shape[1]
-        
+
         end = process_time()
         print("Generating variable: " +name+ " takes  {}".format(end-start))
 
