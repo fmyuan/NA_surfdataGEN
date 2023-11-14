@@ -8,7 +8,7 @@ from time import process_time
 Points_in_land = "DataConversion_info/original_points_index.csv"
 
 # Only wariables listed will be processed
-'''
+
 # nearest neighbor:"double" variables
 Variable_nearest = ['SLOPE', 'TOPO', 'PCT_GLACIER', 'PCT_LAKE', 'STD_ELEV']
 # nearest neighbor:"int" variables
@@ -57,10 +57,11 @@ Variable_linear += ['APATITE_P', 'PCT_CROP']
 #Variable_linear = ['FMAX', 'Ws', 'ZWT0', 'binfl', 'gdp']
 
 # nearest neighbor: "double" variables (added 11/10/2023)
+
 Variable_nearest = ['PCT_SAND', 'PCT_CLAY','ORGANIC' ,'PCT_NAT_PFT', 
         'MONTHLY_LAI', 'MONTHLY_SAI' ,'MONTHLY_HEIGHT_TOP', 'MONTHLY_HEIGHT_BOT']
 Variable_linear = []
-
+'''
 # Open the source file
 src = nc.Dataset('surfdata.nc', 'r')
 
@@ -93,17 +94,10 @@ grid_x, grid_y = np.meshgrid(x_dim,y_dim)
 grid_y1 = np.copy(grid_y[bool_mask])
 grid_x1 = np.copy(grid_x[bool_mask])
 
-del grid_x, grid_y
-
 gridcells= len(grid_x1)
-#grid_y1=grid_y1.compressed()
-#grid_x1=grid_x1.compressed()
 
 print(TBOT.shape,bool_mask.shape, grid_x.shape, grid_x1.shape, gridcells)
-# need to move into the loop
-#data = np.zeros((len(y_dim),len(x_dim)), dtype=variable.datatype)
-#f_data = np.ma.array(data, mask=bool_mask)
-#f_data1 = f_data[bool_mask]
+del grid_x, grid_y
 
 # the X, Y of the points (GCS_WGS_84)in 
 # read in the points within daymet land mask
@@ -150,22 +144,11 @@ for name, variable in src.variables.items():
         x = dst.createVariable(name, variable.datatype, variable.dimensions[:-2]+ ('y_dim', 'x_dim'), fill_value = fill_value)
         # Copy variable attributes
         dst[name].setncatts(src[name].__dict__)
-        """
+
         # prepare the array for the interpolated result
-        f_data = np.ma.array(np.empty((len(y_dim),len(x_dim)), dtype=variable.datatype), mask=bool_mask, fill_value=-9999)
-        #data = np.zeros((len(y_dim),len(x_dim)), dtype=variable.datatype)
-        #f_data = np.ma.array(data, mask=bool_mask)
-
-        #data = np.zeros((len(y_dim),len(x_dim)), dtype=variable.datatype)
-        f_data =  np.ma.filled(f_data, np.nan)
-
-        f_data1 = np.copy(f_data[bool_mask])
-        #f_data1 = f_data1.compressed()
-        #print(name, f_data1.shape, f_data1.mask.shape, f_data.shape, f_data.mask.shape, bool_mask.shape)  
-        """ 
         f_data1 = np.zeros(gridcells, dtype=variable.datatype)
 
-        # Interpolate the variable
+        # original variable data (source) that need to be interpolated
         o_data=np.zeros(land_points, dtype=variable.datatype)
          
         # Handle variables with two dimensions
@@ -178,14 +161,7 @@ for name, variable in src.variables.items():
             f_data1 = griddata(points, o_data, (grid_y1, grid_x1), method=iMethod)
   
             # put the masked data back to the data (with the daymet land mask
-            '''
-            f_data = np.ma.array(f_data, mask=bool_mask)
-            f_data[f_data.mask]=f_data1 
 
-            # fill the masked elements in f_data with the fill_value
-            #filled_f_data = np.ma.filled(f_data, -9999)
-            f_data = np.ma.filled(f_data, -9999)
-            '''
             bool_mask = ~np.isnan(TBOT)
             f_data = np.ma.array(np.empty((len(y_dim),len(x_dim)), dtype=variable.datatype), mask=bool_mask, fill_value=fill_value)
             f_data =  np.where(f_data.mask, f_data, fill_value)
