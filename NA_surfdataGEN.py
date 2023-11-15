@@ -48,6 +48,7 @@ def main():
 
     Variable_nearest += Variable_urban_nearest
 
+<<<<<<< HEAD
     # linear intrepolation of "double" variables
     Variable_linear = ['FMAX', 'Ws', 'ZWT0', 'binfl', 'gdp', 
                     'peatf', 'Ds', 'Dsmax', 'F0', 'LAKEDEPTH',
