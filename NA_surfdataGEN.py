@@ -52,9 +52,6 @@ Variable_linear = ['FMAX', 'Ws', 'ZWT0', 'binfl', 'gdp',
 # linear:"double" variables (added 11/07/22023)
 Variable_linear += ['APATITE_P', 'PCT_CROP']
 '''
-#Variable_nearest = ['SLOPE', 'TOPO', 'PCT_GLACIER', 'PCT_LAKE', 'STD_ELEV']
-
-#Variable_linear = ['FMAX', 'Ws', 'ZWT0', 'binfl', 'gdp']
 
 # nearest neighbor: "double" variables (added 11/10/2023)
 Variable_nearest = ['PCT_SAND', 'PCT_CLAY','ORGANIC' ,'PCT_NAT_PFT', 
@@ -66,7 +63,7 @@ src = nc.Dataset('surfdata.nc', 'r')
 
 # Create a new file
 
-output_file = "hr_surfdata_v1_part1.nc"
+output_file = "hr_surfdata_v1_part2.nc"
 dst = nc.Dataset(output_file, 'w')
 
 # Create new dimensions
@@ -93,7 +90,7 @@ grid_x, grid_y = np.meshgrid(x_dim,y_dim)
 grid_y1 = np.copy(grid_y[bool_mask])
 grid_x1 = np.copy(grid_x[bool_mask])
 
-del grid_x, grid_y
+#del grid_x, grid_y
 
 gridcells= len(grid_x1)
 #grid_y1=grid_y1.compressed()
