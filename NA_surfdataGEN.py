@@ -48,7 +48,6 @@ def main():
 
     Variable_nearest += Variable_urban_nearest
 
-<<<<<<< HEAD
     # linear intrepolation of "double" variables
     Variable_linear = ['FMAX', 'Ws', 'ZWT0', 'binfl', 'gdp', 
                     'peatf', 'Ds', 'Dsmax', 'F0', 'LAKEDEPTH',
@@ -71,9 +70,9 @@ def main():
     src = nc.Dataset('surfdata.nc', 'r')
 
     # Create a new file
-    if user_option == 1:
+    if user_option == '1':
         output_file = "hr_surfdata_v1_part1.nc"
-    if user_option == 2:
+    if user_option == '2':
         output_file = "hr_surfdata_v1_part2.nc"
     if user_option == 'all':
         output_file = "hr_surfdata_v1.nc"
