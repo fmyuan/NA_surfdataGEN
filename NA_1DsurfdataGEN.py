@@ -39,7 +39,7 @@ def surfdata_save_1dNA(input_path, output_path, surfdata_file):
     dst.createDimension('gridcell', len(domain_dim) if not domain_dim.isunlimited() else None)
 
     # copy the gridID, xc, and yc
-    variables_to_copy = ['gridIDs', 'xc', 'yc']  # replace with your variable names
+    variables_to_copy = ['gridID', 'xc', 'yc']  # replace with your variable names
 
     # Copy variables from domain to dst
     for name in variables_to_copy:
@@ -159,7 +159,7 @@ def main():
     """
     
     input_path= './'
-    surfdata_file = 'Daymet4.1km.2D.surfdata_v1_part1.nc'
+    surfdata_file = 'Daymet4.1km.2D.surfdata_v1.nc'
     output_path = input_path
  
     start = process_time() 
