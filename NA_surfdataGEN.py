@@ -146,7 +146,8 @@ def main():
             else:
                 fill_value = np.nan
 
-            x = dst.createVariable(name, variable.datatype, variable.dimensions[:-2]+ ('y_dim', 'x_dim'), fill_value = fill_value)
+            x = dst.createVariable(name, variable.datatype, variable.dimensions[:-2]+ ('y_dim', 'x_dim'), 
+                zlib=True, complevel=9, fill_value = fill_value)
             # Copy variable attributes
             dst[name].setncatts(src[name].__dict__)
 
@@ -242,7 +243,8 @@ def main():
         else:
 
             # keep variables with the same dimension
-            x = dst.createVariable(name, variable.datatype, variable.dimensions)
+            x = dst.createVariable(name, variable.datatype, variable.dimensions,\
+                zlib=True, complevel=9)
             # Copy variable attributes
             dst[name].setncatts(src[name].__dict__)
             # Copy the data
