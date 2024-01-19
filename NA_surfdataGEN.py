@@ -10,6 +10,16 @@ def main():
     args = sys.argv[1:]
     user_option = args[0]
 
+    if  len(sys.argv) != 2 or sys.argv[1] == '--help':  # sys.argv includes the script name as the first argument
+        print("Example use: python NA_surfdataGEN.py <option>")
+        print(" <input_path>: path to the 1D source data directory")
+        print(" <1>:  first part of the surfdata")
+        print(" <2>:  second part of the surfdata)")
+        print(" <all>:  complete list of the surfdata)")
+        print(" The code generate 2D NA surfdata from 0.5x0.5 degree globla surfdata")              
+        exit(0)
+
+
     Points_in_land = "DataConversion_info/original_points_index.csv"
 
     # Only wariables listed will be processed
@@ -75,7 +85,7 @@ def main():
     if user_option == '2':
         output_file = "hr_surfdata_v1_part2.nc"
     if user_option == 'all':
-        output_file = "hr_surfdata_v1.nc"
+        output_file = "Daymet4.1km.2D.surfdata_v1.nc"
 
     dst = nc.Dataset(output_file, 'w')
 
@@ -146,7 +156,8 @@ def main():
             else:
                 fill_value = np.nan
 
-            x = dst.createVariable(name, variable.datatype, variable.dimensions[:-2]+ ('y_dim', 'x_dim'), fill_value = fill_value)
+            x = dst.createVariable(name, variable.datatype, variable.dimensions[:-2]+ ('y_dim', 'x_dim'), \
+                fill_value = fill_value, zlib=True, complevel=5)
             # Copy variable attributes
             dst[name].setncatts(src[name].__dict__)
 
@@ -242,7 +253,8 @@ def main():
         else:
 
             # keep variables with the same dimension
-            x = dst.createVariable(name, variable.datatype, variable.dimensions)
+            x = dst.createVariable(name, variable.datatype, variable.dimensions,\
+                zlib=True, complevel=5)
             # Copy variable attributes
             dst[name].setncatts(src[name].__dict__)
             # Copy the data
