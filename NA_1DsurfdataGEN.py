@@ -157,7 +157,12 @@ def main():
     number_of_subdomains = int(arg[2])
     i_timesteps = int(arg[3])
     """
-    
+
+    if sys.argv[1] == '--help':  # sys.argv includes the script name as the first argument
+        print("Example use: python NA_1DsurfdataGEN.py")
+        print(" The code generates 1D NA surfdata from 2D NA surfdata")              
+        exit(0)
+
     input_path= './'
     surfdata_file = 'Daymet4.1km.2D.surfdata_v1.nc'
     output_path = input_path
