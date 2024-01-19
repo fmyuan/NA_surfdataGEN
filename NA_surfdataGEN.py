@@ -158,7 +158,8 @@ def main():
 
             x = dst.createVariable(name, variable.datatype, variable.dimensions[:-2]+ ('y_dim', 'x_dim'), \
                 fill_value = fill_value, zlib=True, complevel=5)
-            # Copy variable attributes
+            
+	    # Copy variable attributes
             dst[name].setncatts(src[name].__dict__)
 
             # prepare the array for the interpolated result
