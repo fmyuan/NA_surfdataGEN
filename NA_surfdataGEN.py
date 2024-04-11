@@ -12,9 +12,14 @@ from pyproj import CRS
 
 def main():
     args = sys.argv[1:]
-    user_option = args[0]
+    input_path = args[0]
+    if not input_path.endswith("/"): input_path=input_path+'/'
+    output_path = args[1]
+    if not output_path.endswith("/"): output_path=output_path+'/'
+    user_option = args[2]
+    user_option2= args[3]
 
-    if  len(sys.argv) != 2 or sys.argv[1] == '--help':  # sys.argv includes the script name as the first argument
+    if  len(sys.argv) != 3 or sys.argv[1] == '--help':  # sys.argv includes the script name as the first argument
         print("Example use: python NA_surfdataGEN.py <option>")
         print(" <input_path>: path to the 1D source data directory")
         print(" <1>:  first part of the surfdata")
@@ -24,8 +29,10 @@ def main():
         exit(0)
 
     UNSTRUCTURED=True   # 1D
-    #UNSTRUCTURED=False  # 2D
+    if (not user_option2 ==''): UNSTRUCTURED=False  # 2D
 
+    area_km2 = 1.0   # DAYMET grid cell is 1km2 
+    
     # Only wariables listed will be processed
 
     # nearest neighbor:"double" variables
@@ -168,12 +175,12 @@ def main():
     dst.createDimension('x_dim', x_dim.size)
     dst.createDimension('y_dim', y_dim.size)
 
-    dst_var = dst.createVariable('x_dim', np.float32, ('x_dim'))
+    dst_var = dst.createVariable('x_dim', np.float64, ('x_dim'))
     dst_var.units = "m"
     dst_var.long_name = "x coordinate of projection"
     dst_var.standard_name = "projection_x_coordinate"
     dst['x_dim'][...] = np.copy(x_dim)
-    dst_var = dst.createVariable('y_dim', np.float32, ('y_dim'))
+    dst_var = dst.createVariable('y_dim', np.float64, ('y_dim'))
     dst_var.units = "m"
     dst_var.long_name = "y coordinate of projection"
     dst_var.standard_name = "projection_y_coordinate"
@@ -190,12 +197,12 @@ def main():
     dst_var.inverse_flattening = 298.257223563
 
     if UNSTRUCTURED:
-        dst_var = dst.createVariable('lon', np.float32, ('y_dim','x_dim'))
+        dst_var = dst.createVariable('lon', np.float64, ('y_dim','x_dim'))
         dst_var.units = "degrees_east"
         dst_var.long_name = "longitude coordinate"
         dst_var.standard_name = "longitude"
         dst['lon'][...] = np.copy(lon)
-        dst_var = dst.createVariable('lat', np.float32, ('y_dim','x_dim'))
+        dst_var = dst.createVariable('lat', np.float64, ('y_dim','x_dim'))
         dst_var.units = "degrees_north"
         dst_var.long_name = "latitude coordinate"
         dst_var.standard_name = "latitude"
@@ -275,7 +282,7 @@ def main():
                 source = src[name][:]
                 o_data = source[points_in_daymet_land[4][:],points_in_daymet_land[5][:]]
                 f_data1 = griddata(points, o_data, (grid_y1, grid_x1), method=iMethod)
-                if name=='AREA': f_data1[...] = 1.0
+                if name=='AREA': f_data1[...] = area_km2
                 if name=='LONGXY': f_data1[...] = grid_lon
                 if name=='LATIXY': f_data1[...] = grid_lat
                 
